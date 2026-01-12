@@ -7,6 +7,7 @@ import { AudioRecorder } from '@/lib/audioRecorder';
 import { analyzeAudio, AnalysisResult } from '@/lib/api';
 import { surahs, Surah } from '@/data/surahs';
 import starMascot from '@/assets/star-mascot.png';
+import siraj from '@/assets/star-mascot.png';
 import ResultsDashboard from '@/components/ResultsDashboard';
 
 const QuranLab = () => {
@@ -68,7 +69,7 @@ const QuranLab = () => {
             {/* Logo */}
             <div className="flex items-center gap-3 mb-8">
               <img src={starMascot} alt="سراج" className="w-10 h-10" />
-              <span className="text-xl font-bold text-sidebar-foreground">سراج</span>
+              <span>سراج</span>
             </div>
 
             {/* Navigation */}
@@ -111,6 +112,7 @@ const QuranLab = () => {
               className="mt-6"
             >
               <img src={starMascot} alt="سراج" className="w-24 h-24 mx-auto opacity-50" />
+            
             </motion.div>
           </motion.aside>
         )}
@@ -131,7 +133,7 @@ const QuranLab = () => {
           
           <div className="flex items-center gap-4">
             <h1 className="text-2xl lg:text-3xl font-bold text-foreground">
-              معمل القرآن الكريم
+              حلقات القرآن الكريم
             </h1>
             <div className="bg-accent/20 text-primary px-4 py-2 rounded-full text-sm font-medium">
               سورة {selectedSurah.name}
