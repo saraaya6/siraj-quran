@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button';
 import starMascot from '@/assets/star-mascot.png';
 import siraj from '@/assets/siraj.svg';
 import childrenGroup from '@/assets/children-group.png';
-
+ 
 const Landing = () => {
   const navigate = useNavigate();
 
@@ -79,11 +79,13 @@ const Landing = () => {
             </motion.div>
 
             <h1 className="text-5xl lg:text-7xl font-bold text-white leading-tight font-cairo">
-              <span className="text-accent">سراج:</span>
-              <br />
-              نور قلوب الصغار
-              <br />
-              بالقرآن
+              <span className="text-accent">سراج</span>
+            </h1>
+
+            <h1 className="text-5xl me:text-7xl font-bold text-white leading-tight font-cairo">
+              
+              
+              نور قلوب الصغار بالقرآن
             </h1>
 
             <p className="text-xl lg:text-2xl text-accent-light/80 max-w-lg ml-auto font-cairo leading-relaxed">
