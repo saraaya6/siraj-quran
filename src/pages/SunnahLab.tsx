@@ -1,7 +1,7 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react'; // تأكد من وجود useEffect هنا
 import { motion, AnimatePresence } from 'framer-motion';
 import { Link } from 'react-router-dom';
-import { Home, Star, CheckCircle2, XCircle } from 'lucide-react';
+import { Home, Star, CheckCircle2, XCircle } from 'lucide-react'; 
 import { Button } from '@/components/ui/button';
 import starMascot from '@/assets/star-mascot.png';
 import { sunnahLessons } from '@/data/sunnah';
