@@ -8,9 +8,7 @@ import QuranLab from "./pages/QuranLab";
 import ParentCorner from "./pages/ParentCorner";
 import NotFound from "./pages/NotFound";
 import SunnahLab from "./pages/SunnahLab";
-
-// 1. استيراد المكون الجديد (تأكد من إنشاء ملف LiquidEther.tsx في مجلد components)
-import LiquidEther from './components/LiquidEther'; 
+import LiquidEther from './components/LiquidEther'; // تأكد من إنشاء هذا الملف أولاً
 
 const queryClient = new QueryClient();
 
@@ -20,13 +18,13 @@ const App = () => (
       <Toaster />
       <Sonner />
       
-      {/* 2. الحاوية الرئيسية للموقع لضمان ثبات الخلفية */}
+      {/* بداية التعديل: الحاوية الرئيسية */}
       <div className="relative min-h-screen">
         
-        {/* 3. إضافة طبقة الخلفية المتحركة خلف كل شيء (-z-10) */}
+        {/* طبقة الخلفية المتحركة - تبقى ثابتة في الخلف */}
         <div className="fixed inset-0 -z-10 pointer-events-none">
           <LiquidEther
-            colors={['#FDE68A', '#F97316', '#FB923C']} // ألوان سراج
+            colors={['#FDE68A', '#F97316', '#FB923C']} 
             mouseForce={15}
             cursorSize={80}
             resolution={0.4}
@@ -34,7 +32,7 @@ const App = () => (
           />
         </div>
 
-        {/* 4. محتوى الموقع الأصلي (الراوتر) في طبقة أعلى (z-10) */}
+        {/* طبقة محتوى الموقع - الروابط والصفحات */}
         <div className="relative z-10">
           <BrowserRouter>
             <Routes>
@@ -48,6 +46,8 @@ const App = () => (
         </div>
         
       </div>
+      {/* نهاية التعديل */}
+      
     </TooltipProvider>
   </QueryClientProvider>
 );
