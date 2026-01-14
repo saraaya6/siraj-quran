@@ -7,6 +7,7 @@ import Landing from "./pages/Landing";
 import QuranLab from "./pages/QuranLab";
 import ParentCorner from "./pages/ParentCorner";
 import NotFound from "./pages/NotFound";
+import SunnahLab from "./pages/SunnahLab";
 
 const queryClient = new QueryClient();
 
@@ -21,6 +22,7 @@ const App = () => (
           <Route path="/learn" element={<QuranLab />} />
           <Route path="/parent" element={<ParentCorner />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
+          <Route path="/sunnah" element={<SunnahLab />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </BrowserRouter>
