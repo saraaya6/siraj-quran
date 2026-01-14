@@ -5,21 +5,21 @@ import { Button } from "@/components/ui/button";
 import starMascot from "@/assets/star-mascot.png";
 import siraj from "@/assets/siraj.svg";
 import childrenGroup from "@/assets/children-group.png";
-import { useRef } from "react"; // استيراد useRef
+import { useRef } from "react";
 
 const Landing = () => {
   const navigate = useNavigate();
-  // 1. إنشاء مرجع (Reference) لقسم البطاقات
+  // مراجع للتحكم في التمرير السلس
   const cardsSectionRef = useRef<HTMLDivElement>(null);
 
-  // 2. دالة النزول السلس
   const scrollToCards = () => {
     cardsSectionRef.current?.scrollIntoView({ behavior: "smooth" });
   };
 
   return (
+    // تم إزالة bg-gradient-to-b لكي تظهر الخلفية المتحركة من ملف App.tsx
     <div
-      className="min-h-screen bg-gradient-to-b from-primary-dark to-primary overflow-hidden dir-rtl"
+      className="min-h-screen overflow-hidden dir-rtl"
       dir="rtl"
     >
       {/* Navigation */}
@@ -82,11 +82,9 @@ const Landing = () => {
               <span>منصة تعليمية تفاعلية للأطفال</span>
             </motion.div>
 
+            {/* تم دمج العنوانين في وسم واحد لتحسين الأداء والمظهر */}
             <h1 className="text-5xl lg:text-7xl font-bold text-white leading-tight font-cairo">
-              <span className="text-accent">سراج</span>
-            </h1>
-
-            <h1 className="text-5xl lg:text-7xl font-bold text-white leading-tight font-cairo">
+              <span className="text-accent">سراج</span> <br />
               نور قلوب الصغار بالقرآن
             </h1>
 
@@ -105,7 +103,6 @@ const Landing = () => {
                 ابدأ التعلم
               </Button>
               <Button
-                // 3. ربط الدالة بالزر
                 onClick={scrollToCards}
                 variant="outline"
                 size="xl"
@@ -160,19 +157,20 @@ const Landing = () => {
                 }}
                 className="absolute -top-10 -right-5 w-32 md:w-48 h-auto z-20 drop-shadow-xl"
               />
-              <div className="absolute inset-0 bg-accent/10 rounded-full blur-[100px] -z-10" />
+              {/* توهج خفيف خلف الشخصيات */}
+              <div className="absolute inset-0 bg-accent/5 rounded-full blur-[100px] -z-10" />
             </div>
           </motion.div>
         </div>
       </section>
 
-      {/* 4. إضافة المرجع (ref) لهذا القسم ليعرف المتصفح أين ينزل */}
+      {/* قسم البطاقات التفاعلية */}
       <div 
         ref={cardsSectionRef} 
         className="container mx-auto px-6 grid grid-cols-1 md:grid-cols-3 gap-8 relative z-10 py-12"
       >
         <Link to="/learn" className="block transform transition-all duration-300 hover:scale-105 hover:-translate-y-2">
-          <div className="bg-white/10 backdrop-blur-md p-8 rounded-3xl shadow-xl text-center cursor-pointer border border-white/20 hover:border-accent/50 transition-all group">
+          <div className="bg-white/5 backdrop-blur-md p-8 rounded-3xl shadow-xl text-center cursor-pointer border border-white/10 hover:border-accent/50 transition-all group">
             <div className="w-20 h-20 bg-accent/20 rounded-2xl flex items-center justify-center mx-auto mb-6 group-hover:scale-110 transition-transform">
               <BookOpen className="w-10 h-10 text-accent" />
             </div>
@@ -182,7 +180,7 @@ const Landing = () => {
         </Link>
 
         <Link to="/sunnah" className="block transform transition-all duration-300 hover:scale-105 hover:-translate-y-2">
-          <div className="bg-white/10 backdrop-blur-md p-8 rounded-3xl shadow-xl text-center cursor-pointer border border-white/20 hover:border-accent/50 transition-all group">
+          <div className="bg-white/5 backdrop-blur-md p-8 rounded-3xl shadow-xl text-center cursor-pointer border border-white/10 hover:border-accent/50 transition-all group">
             <div className="w-20 h-20 bg-accent/20 rounded-2xl flex items-center justify-center mx-auto mb-6 group-hover:scale-110 transition-transform">
               <Star className="w-10 h-10 text-yellow-400 fill-yellow-400" />
             </div>
@@ -192,7 +190,7 @@ const Landing = () => {
         </Link>
 
         <Link to="/parent" className="block transform transition-all duration-300 hover:scale-105 hover:-translate-y-2">
-          <div className="bg-white/10 backdrop-blur-md p-8 rounded-3xl shadow-xl text-center cursor-pointer border border-white/20 hover:border-accent/50 transition-all group">
+          <div className="bg-white/5 backdrop-blur-md p-8 rounded-3xl shadow-xl text-center cursor-pointer border border-white/10 hover:border-accent/50 transition-all group">
             <div className="w-20 h-20 bg-accent/20 rounded-2xl flex items-center justify-center mx-auto mb-6 group-hover:scale-110 transition-transform">
               <Users className="w-10 h-10 text-accent" />
             </div>
@@ -203,7 +201,6 @@ const Landing = () => {
       </div>
 
       <footer className="container mx-auto px-6 py-12 border-t border-accent/10 mt-20 relative z-10">
-        {/* ... بقية الفوتر لم تتغير */}
         <div className="flex flex-col md:flex-row items-center justify-between gap-8">
           <div className="flex items-center group cursor-pointer transition-transform hover:scale-105" onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}>
             <div className="flex items-center">
