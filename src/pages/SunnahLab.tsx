@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'; // تأكد من وجود useEffect هنا
+import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Link } from 'react-router-dom';
 import { Home, Star, CheckCircle2, XCircle } from 'lucide-react'; 
@@ -20,15 +20,23 @@ const SunnahLab = () => {
     return [...array].sort(() => Math.random() - 0.5);
   };
 
+  // دالة إعادة المحاولة بدون reload الصفحة بالكامل (أفضل للأداء)
+  const resetQuiz = () => {
+    setCurrentIndex(0);
+    setScore(0);
+    setIsFinished(false);
+    setFeedback(null);
+  };
+
   useEffect(() => {
-    if (currentLesson) {
-      // نخلط الخيارات عند كل سؤال جديد لضمان تغير الأماكن
+    if (currentLesson && !isFinished) {
       setShuffledOptions(shuffleArray(currentLesson.options));
     }
-  }, [currentIndex]);
+  }, [currentIndex, isFinished]);
 
   const handleAnswer = (optionId: number) => {
-    // نتحقق من معرف الخيار (ID) بدلاً من مسار الصورة لتجنب تضارب الصور المتكررة
+    if (feedback) return; // منع النقر المتكرر أثناء إظهار النتيجة
+
     if (optionId === currentLesson.correctId) {
       setScore(prev => prev + 1);
       setFeedback('correct');
@@ -45,23 +53,25 @@ const SunnahLab = () => {
       }
     }, 1500);
   };
-if (isFinished) {
+
+  // عرض شاشة النتيجة
+  if (isFinished) {
     const isZeroScore = score === 0;
 
     return (
-      <div className="min-h-screen bg-background flex flex-col items-center justify-center p-6 text-center font-arabic">
+      <div className="min-h-screen bg-background flex flex-col items-center justify-center p-6 text-center font-arabic" dir="rtl">
         <motion.div 
           initial={{ scale: 0 }} 
           animate={{ scale: 1 }} 
           className="bg-card p-10 rounded-3xl shadow-playful max-w-md w-full border-t-8 border-transparent"
-          style={{ borderColor: isZeroScore ? '#ef4444' : '#10b981' }} // أحمر للفشل وأخضر للنجاح
+          style={{ borderColor: isZeroScore ? '#ef4444' : '#10b981' }}
         >
           <img src={starMascot} className={`w-32 h-32 mx-auto mb-6 ${isZeroScore ? 'grayscale' : ''}`} alt="النتيجة" />
           
           {isZeroScore ? (
             <>
-              <h2 className="text-4xl font-bold text-destructive mb-4">حاول مرة أخرى! 🧐</h2>
-              <p className="text-2xl mb-6 text-foreground">
+              <h2 className="text-3xl font-bold text-destructive mb-4">حاول مرة أخرى! 🧐</h2>
+              <p className="text-xl mb-6 text-foreground">
                 لم تجب على أي سؤال بشكل صحيح. لا بأس، يمكنك التعلم والإعادة!
               </p>
             </>
@@ -75,50 +85,7 @@ if (isFinished) {
           )}
 
           <Button 
-            onClick={() => window.location.reload()} 
-            variant={isZeroScore ? "destructive" : "default"}
-            className="w-full text-xl py-6 rounded-2xl mb-4"
-          >
-            إعادة المحاولة 🔄
-          </Button>
-          
-          <Link to="/" className="block text-muted-foreground hover:text-primary transition-colors">
-            العودة للرئيسية
-          </Link>
-        </motion.div>
-      </div>
-    );
-  }if (isFinished) {
-    const isZeroScore = score === 0;
-
-    return (
-      <div className="min-h-screen bg-background flex flex-col items-center justify-center p-6 text-center font-arabic">
-        <motion.div 
-          initial={{ scale: 0 }} 
-          animate={{ scale: 1 }} 
-          className="bg-card p-10 rounded-3xl shadow-playful max-w-md w-full border-t-8 border-transparent"
-          style={{ borderColor: isZeroScore ? '#ef4444' : '#10b981' }} // أحمر للفشل وأخضر للنجاح
-        >
-          <img src={starMascot} className={`w-32 h-32 mx-auto mb-6 ${isZeroScore ? 'grayscale' : ''}`} alt="النتيجة" />
-          
-          {isZeroScore ? (
-            <>
-              <h2 className="text-4xl font-bold text-destructive mb-4">حاول مرة أخرى! 🧐</h2>
-              <p className="text-2xl mb-6 text-foreground">
-                لم تجب على أي سؤال بشكل صحيح. لا بأس، يمكنك التعلم والإعادة!
-              </p>
-            </>
-          ) : (
-            <>
-              <h2 className="text-4xl font-bold text-primary mb-4">مبارك! 🌟</h2>
-              <p className="text-2xl mb-6 text-foreground">
-                لقد أجبت على <span className="text-primary font-bold">{score}</span> من أصل <span className="font-bold">{sunnahLessons.length}</span>
-              </p>
-            </>
-          )}
-
-          <Button 
-            onClick={() => window.location.reload()} 
+            onClick={resetQuiz} 
             variant={isZeroScore ? "destructive" : "default"}
             className="w-full text-xl py-6 rounded-2xl mb-4"
           >
@@ -133,6 +100,7 @@ if (isFinished) {
     );
   }
 
+  // عرض الأسئلة
   return (
     <div className="min-h-screen bg-background p-6 lg:p-10 font-arabic text-right" dir="rtl">
       {/* Header */}
