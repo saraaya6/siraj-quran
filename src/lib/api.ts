@@ -1,7 +1,7 @@
 import axios from 'axios';
 
-// الرابط الجديد الذي قدمته المهندسة رغد (يدعم HTTPS)
-const AI_API_URL = 'https://siraj.csch-svu.com:8001';
+// تأكدي أن هذا المتغير يقرأ من Vercel
+const AI_API_URL = import.meta.env.VITE_AI_API_URL;
 const NOTES_API_URL = import.meta.env.VITE_NOTES_API_URL;
 
 export interface MistakeResult {
@@ -33,11 +33,13 @@ export const analyzeAudio = async (
   const formData = new FormData();
   formData.append('file', audioBlob, 'recording.wav');
 
-  console.log("Connecting directly to secure AI Server at:", `${AI_API_URL}/analyze`);
+  // طباعة الرابط للتأكد في المتصفح
+  console.log("Full Request URL:", `${AI_API_URL}/audio/analyze`);
 
   try {
+    // تعديل المسار بإضافة /audio بناءً على تحديث المهندسة رغد
     const response = await axios.post(
-      `${AI_API_URL}/analyze?surah=${encodeURIComponent(surah)}&language=${encodeURIComponent(language)}`,
+      `${AI_API_URL}/audio/analyze?surah=${encodeURIComponent(surah)}&language=${encodeURIComponent(language)}`,
       formData,
       {
         headers: {
