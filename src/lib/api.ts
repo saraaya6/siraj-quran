@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-// تأكدي أن هذا المتغير يقرأ من Vercel
+// قراءة الروابط من متغيرات بيئة Vercel
 const AI_API_URL = import.meta.env.VITE_AI_API_URL;
 const NOTES_API_URL = import.meta.env.VITE_NOTES_API_URL;
 
@@ -31,13 +31,13 @@ export const analyzeAudio = async (
   language: string = 'ar'
 ): Promise<AnalysisResult> => {
   const formData = new FormData();
+  // إرسال الملف تحت مفتاح 'file' كما يتوقع السيرفر
   formData.append('file', audioBlob, 'recording.wav');
 
-  // طباعة الرابط للتأكد في المتصفح
+  // طباعة الرابط للتأكد من صحة العنوان والمنفذ في المتصفح
   console.log("Full Request URL:", `${AI_API_URL}/audio/analyze`);
 
   try {
-    // تعديل المسار بإضافة /audio بناءً على تحديث المهندسة رغد
     const response = await axios.post(
       `${AI_API_URL}/audio/analyze?surah=${encodeURIComponent(surah)}&language=${encodeURIComponent(language)}`,
       formData,
@@ -49,14 +49,23 @@ export const analyzeAudio = async (
     );
 
     const data = response.data;
+    
+    // سطر الفحص الأهم: يطبع لك البيانات الخام القادمة من السيرفر في الـ Console
+    console.log("البيانات القادمة من السيرفر:", data);
+
+    // التحقق من وجود حقل mistakes أو استخدام مصفوفات فارغة كبديل
     const mistakes = data.mistakes || { missing: [], extra: [], replaced: [] };
+    
+    // حساب مجموع الأخطاء المكتشفة
     const totalMistakes = 
       (mistakes.missing?.length || 0) + 
       (mistakes.extra?.length || 0) + 
       (mistakes.replaced?.length || 0);
     
+    // معادلة حساب نسبة الدقة بناءً على الأخطاء
     const accuracy = Math.max(0, Math.min(100, ((20 - totalMistakes) / 20) * 100));
     
+    // تحديد النصيحة التعليمية بناءً على الأداء
     let recommendation: string;
     if (accuracy >= 90) {
       recommendation = 'ممتاز! كرر مرة واحدة للتعزيز.';
