@@ -1,7 +1,9 @@
 import axios from 'axios';
 
-const AI_API_URL = import.meta.env.VITE_AI_API_URL;
-const NOTES_API_URL = import.meta.env.VITE_NOTES_API_URL; // تأكدي من إضافة VITE_ هنا أيضاً
+// عند استخدام Proxy في Vercel، نقوم بالاتصال بمسار محلي يبدأ بـ /api
+// وVercel سيقوم بتحويله تلقائياً للسيرفر الخارجي (41.33.55.164:8001)
+const AI_API_PROXY_URL = '/api/analyze'; 
+const NOTES_API_URL = import.meta.env.VITE_NOTES_API_URL;
 
 export interface MistakeResult {
   missing: string[];
@@ -32,12 +34,13 @@ export const analyzeAudio = async (
   const formData = new FormData();
   formData.append('file', audioBlob, 'recording.wav');
 
-  // هذا السطر سيطبع لك الرابط في الـ Console لتتأكدي أنه يذهب للـ IP الصحيح (41.xxx)
-  console.log("Connecting to AI Server at:", `${AI_API_URL}/analyze`);
+  // سنطبع الآن المسار المحلي المتصل بالبروكسي
+  console.log("Connecting to AI via Vercel Proxy at:", AI_API_PROXY_URL);
 
   try {
+    // نرسل الطلب إلى المسار المحلي المذكور في vercel.json
     const response = await axios.post(
-      `${AI_API_URL}/analyze?surah=${encodeURIComponent(surah)}&language=${encodeURIComponent(language)}`,
+      `${AI_API_PROXY_URL}?surah=${encodeURIComponent(surah)}&language=${encodeURIComponent(language)}`,
       formData,
       {
         headers: {
@@ -70,9 +73,10 @@ export const analyzeAudio = async (
       recommendation,
       totalMistakes,
     };
-  } catch (error) {
+  } catch (error: any) {
     console.error('Error analyzing audio:', error);
-    throw new Error('فشل الاتصال بسيرفر الذكاء الاصطناعي. تأكد من صحة الرابط والـ IP.');
+    // تنبيه بسيط: إذا ظهر خطأ 504، فهذا يعني أن سيرفر الذكاء الاصطناعي استغرق وقتاً طويلاً في الرد
+    throw new Error('فشل التحليل. تأكد من استجابة السيرفر الخارجي.');
   }
 };
 

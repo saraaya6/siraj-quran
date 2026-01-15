@@ -1,0 +1,8 @@
+{
+  "rewrites": [
+    {
+      "source": "/api/analyze",
+      "destination": "http://41.33.55.164:8001/analyze"
+    }
+  ]
+}
