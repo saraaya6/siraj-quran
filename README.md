@@ -1,6 +1,6 @@
 # Siraj (سراج) 🌟
 **Siraj** is an interactive educational web platform designed to help children learn the Holy Quran and Sunnah in an engaging and fun environment. Using AI-powered recitation analysis, Siraj provides real-time feedback to improve children's Tajweed and memorization.
-
+https://sirajhacathon.netlify.app/
 ## ✨ Features
 - **Quran Learning Lab:** Interactive interface for reciting Surahs (e.g., Surah An-Nas) with real-time audio recording.
 - **AI Recitation Analysis:** Integration with an AI API to analyze audio files (.wav) for accuracy, detecting missing, extra, or replaced words.
