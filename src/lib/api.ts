@@ -1,8 +1,7 @@
 import axios from 'axios';
 
-// عند استخدام Proxy في Vercel، نقوم بالاتصال بمسار محلي يبدأ بـ /api
-// وVercel سيقوم بتحويله تلقائياً للسيرفر الخارجي (41.33.55.164:8001)
-const AI_API_PROXY_URL = '/api/analyze'; 
+// الرابط الجديد الذي قدمته المهندسة رغد (يدعم HTTPS)
+const AI_API_URL = 'https://siraj.csch-svu.com:8001';
 const NOTES_API_URL = import.meta.env.VITE_NOTES_API_URL;
 
 export interface MistakeResult {
@@ -34,13 +33,11 @@ export const analyzeAudio = async (
   const formData = new FormData();
   formData.append('file', audioBlob, 'recording.wav');
 
-  // سنطبع الآن المسار المحلي المتصل بالبروكسي
-  console.log("Connecting to AI via Vercel Proxy at:", AI_API_PROXY_URL);
+  console.log("Connecting directly to secure AI Server at:", `${AI_API_URL}/analyze`);
 
   try {
-    // نرسل الطلب إلى المسار المحلي المذكور في vercel.json
     const response = await axios.post(
-      `${AI_API_PROXY_URL}?surah=${encodeURIComponent(surah)}&language=${encodeURIComponent(language)}`,
+      `${AI_API_URL}/analyze?surah=${encodeURIComponent(surah)}&language=${encodeURIComponent(language)}`,
       formData,
       {
         headers: {
@@ -73,10 +70,9 @@ export const analyzeAudio = async (
       recommendation,
       totalMistakes,
     };
-  } catch (error: any) {
+  } catch (error) {
     console.error('Error analyzing audio:', error);
-    // تنبيه بسيط: إذا ظهر خطأ 504، فهذا يعني أن سيرفر الذكاء الاصطناعي استغرق وقتاً طويلاً في الرد
-    throw new Error('فشل التحليل. تأكد من استجابة السيرفر الخارجي.');
+    throw new Error('فشل الاتصال بسيرفر الذكاء الاصطناعي. تأكد من استجابة السيرفر.');
   }
 };
 
