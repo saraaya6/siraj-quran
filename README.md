@@ -36,17 +36,12 @@ Bash
 
 npm install
 Running Locally
-To start the development server:
 
-Bash
-
-npm run dev
-The application will be available at http://localhost:5173.
 
 🔗 API Integration
 AI Analysis: The frontend communicates with an external AI service .
 
-Backend Service: Parent reports are fetched from a local backend at http://localhost:5000/notes.
+Backend Service: Parent reports are fetched from a local backend .
 
 🎨 UI/UX Design
 The project uses a custom theme with the following primary colors:
