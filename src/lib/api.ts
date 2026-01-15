@@ -108,4 +108,5 @@ export const fetchSessionNotes = async (): Promise<SessionNote[]> => {
       }
     ];
   }
+  
 };
