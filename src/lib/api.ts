@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 const AI_API_URL = import.meta.env.VITE_AI_API_URL;
-const NOTES_API_URL = import.meta.env.NOTES_API_URL ;
+const NOTES_API_URL = import.meta.env.VITE_NOTES_API_URL; // تأكدي من إضافة VITE_ هنا أيضاً
 
 export interface MistakeResult {
   missing: string[];
@@ -32,10 +32,12 @@ export const analyzeAudio = async (
   const formData = new FormData();
   formData.append('file', audioBlob, 'recording.wav');
 
+  // هذا السطر سيطبع لك الرابط في الـ Console لتتأكدي أنه يذهب للـ IP الصحيح (41.xxx)
+  console.log("Connecting to AI Server at:", `${AI_API_URL}/analyze`);
+
   try {
-    // إرسال الطلب إلى السيرفر المشفر في ملف البيئة
     const response = await axios.post(
-      `${AI_API_URL}/audio/analyze?surah=${encodeURIComponent(surah)}&language=${encodeURIComponent(language)}`,
+      `${AI_API_URL}/analyze?surah=${encodeURIComponent(surah)}&language=${encodeURIComponent(language)}`,
       formData,
       {
         headers: {
@@ -45,18 +47,14 @@ export const analyzeAudio = async (
     );
 
     const data = response.data;
-    
-    // حساب الدقة بناءً على الأخطاء الواردة من السيرفر
     const mistakes = data.mistakes || { missing: [], extra: [], replaced: [] };
     const totalMistakes = 
       (mistakes.missing?.length || 0) + 
       (mistakes.extra?.length || 0) + 
       (mistakes.replaced?.length || 0);
     
-    // معادلة حساب نسبة الدقة
     const accuracy = Math.max(0, Math.min(100, ((20 - totalMistakes) / 20) * 100));
     
-    // تحديد النصيحة التعليمية بناءً على مستوى الأداء
     let recommendation: string;
     if (accuracy >= 90) {
       recommendation = 'ممتاز! كرر مرة واحدة للتعزيز.';
@@ -73,9 +71,8 @@ export const analyzeAudio = async (
       totalMistakes,
     };
   } catch (error) {
-    // في حال فشل الاتصال، يتم تسجيل الخطأ الحقيقي وإبلاغ المستخدم بدلاً من عرض بيانات وهمية
     console.error('Error analyzing audio:', error);
-    throw new Error('فشل الاتصال بسيرفر الذكاء الاصطناعي. تأكد من تشغيل السيرفر وصحة عنوان IP.');
+    throw new Error('فشل الاتصال بسيرفر الذكاء الاصطناعي. تأكد من صحة الرابط والـ IP.');
   }
 };
 
@@ -85,7 +82,6 @@ export const fetchSessionNotes = async (): Promise<SessionNote[]> => {
     return response.data;
   } catch (error) {
     console.error('Error fetching session notes:', error);
-    // تم الإبقاء على البيانات التجريبية هنا فقط لعرض واجهة ركن الوالدين حال عدم توفر باك إند محلي
     return [
       {
         id: '1',
