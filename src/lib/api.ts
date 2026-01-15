@@ -44,38 +44,39 @@ export const analyzeAudio = async (
     );
 
     const data = response.data;
-    console.log("البيانات المستلمة:", data);
+    console.log("البيانات المستلمة من سراج:", data);
 
-    // 1. استخراج الأخطاء من حقل ayahs إذا وجد، أو نضع مصفوفات فارغة
-    // ملاحظة: السيرفر حالياً لا يرسل تفاصيل الأخطاء بشكل صريح في mistakes
-    const mistakes: MistakeResult = data.mistakes || {
+    // تجهيز كائن الأخطاء لعرضه في الواجهة
+    const mistakes: MistakeResult = {
       missing: [],
       extra: [],
       replaced: []
     };
 
-    // 2. استخدام الدقة المرسلة مباشرة من السيرفر
-    // إذا كانت overall_accuracy موجودة نستخدمها، وإلا نضع 0
-    const accuracy = data.overall_accuracy !== undefined ? data.overall_accuracy : 0;
+    // استخراج الكلمات المستبدلة من الآيات التي بها اختلاف
+    if (data.ayahs && Array.isArray(data.ayahs)) {
+      data.ayahs.forEach((item: any) => {
+        if (item.heard_normalized !== item.reference) {
+          mistakes.replaced.push({
+            expected: item.reference,
+            got: item.heard_raw
+          });
+        }
+      });
+    }
 
-    // 3. استخدام التوصية المرسلة من السيرفر
-    const recommendation = data.recommendation || "استمر في المحاولة!";
-
-    // 4. حساب عدد الأخطاء (سيكون 0 حالياً لأن السيرفر لا يرسل تفاصيل mistakes)
-    const totalMistakes = 
-      (mistakes.missing?.length || 0) + 
-      (mistakes.extra?.length || 0) + 
-      (mistakes.replaced?.length || 0);
+    // استخدام الدقة المرسلة من السيرفر (75 في مثالك)
+    const accuracy = data.overall_accuracy !== undefined ? data.overall_accuracy : 100;
 
     return {
       mistakes,
       accuracy,
-      recommendation,
-      totalMistakes,
+      recommendation: data.recommendation || "جيد! استمر في التمرين.",
+      totalMistakes: mistakes.replaced.length + mistakes.missing.length + mistakes.extra.length,
     };
   } catch (error) {
     console.error('Error analyzing audio:', error);
-    throw new Error('فشل الاتصال بسيرفر الذكاء الاصطناعي.');
+    throw new Error('فشل الاتصال بسيرفر سراج.');
   }
 };
 
@@ -85,13 +86,7 @@ export const fetchSessionNotes = async (): Promise<SessionNote[]> => {
     return response.data;
   } catch (error) {
     return [
-      {
-        id: '1',
-        date: '2026-01-10',
-        surah: 'الناس',
-        accuracy: 85,
-        notes: 'أداء جيد مع بعض الأخطاء في الحركات',
-      }
+      { id: '1', date: '2026-01-15', surah: 'الناس', accuracy: 75, notes: 'أداء جيد' }
     ];
   }
 };
