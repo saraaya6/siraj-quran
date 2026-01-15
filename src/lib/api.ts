@@ -16,14 +16,6 @@ export interface AnalysisResult {
   totalMistakes: number;
 }
 
-export interface SessionNote {
-  id: string;
-  date: string;
-  surah: string;
-  accuracy: number;
-  notes: string;
-}
-
 export const analyzeAudio = async (
   audioBlob: Blob,
   surah: string = 'An-Nas',
@@ -36,57 +28,51 @@ export const analyzeAudio = async (
     const response = await axios.post(
       `${AI_API_URL}/audio/analyze?surah=${encodeURIComponent(surah)}&language=${encodeURIComponent(language)}`,
       formData,
-      {
-        headers: {
-          'Content-Type': 'multipart/form-data',
-        },
-      }
+      { headers: { 'Content-Type': 'multipart/form-data' } }
     );
 
     const data = response.data;
-    console.log("البيانات المستلمة من سراج:", data);
+    console.log("تم استلام البيانات وتحويلها:", data);
 
-    // تجهيز كائن الأخطاء لعرضه في الواجهة
     const mistakes: MistakeResult = {
       missing: [],
       extra: [],
       replaced: []
     };
 
-    // استخراج الكلمات المستبدلة من الآيات التي بها اختلاف
+    // هذا الجزء هو "المحرك" الجديد الذي يقرأ مصفوفة ayahs التي أظهرها الكونسول
     if (data.ayahs && Array.isArray(data.ayahs)) {
       data.ayahs.forEach((item: any) => {
+        // إذا كان السيرفر يقول أن هناك عدم تطابق في الآية
         if (item.heard_normalized !== item.reference) {
           mistakes.replaced.push({
-            expected: item.reference,
-            got: item.heard_raw
+            expected: item.reference, // النص الصحيح للآية
+            got: item.heard_raw       // ما نطقته سارة
           });
         }
       });
     }
 
-    // استخدام الدقة المرسلة من السيرفر (75 في مثالك)
-    const accuracy = data.overall_accuracy !== undefined ? data.overall_accuracy : 100;
-
+    // نستخدم الأرقام القادمة من رغد مباشرة (75 أو 100 أو غيره)
     return {
       mistakes,
-      accuracy,
-      recommendation: data.recommendation || "جيد! استمر في التمرين.",
-      totalMistakes: mistakes.replaced.length + mistakes.missing.length + mistakes.extra.length,
+      accuracy: data.overall_accuracy !== undefined ? data.overall_accuracy : 0,
+      recommendation: data.recommendation || "استمر في المحاولة",
+      totalMistakes: mistakes.replaced.length
     };
+
   } catch (error) {
     console.error('Error analyzing audio:', error);
-    throw new Error('فشل الاتصال بسيرفر سراج.');
+    throw new Error('فشل الاتصال بسيرفر الذكاء الاصطناعي.');
   }
 };
 
-export const fetchSessionNotes = async (): Promise<SessionNote[]> => {
+export const fetchSessionNotes = async () => {
   try {
     const response = await axios.get(`${NOTES_API_URL}/notes`);
     return response.data;
   } catch (error) {
-    return [
-      { id: '1', date: '2026-01-15', surah: 'الناس', accuracy: 75, notes: 'أداء جيد' }
-    ];
+    // في حال عدم توفر الباك إند الخاص بالملاحظات
+    return [{ id: '1', date: '2026-01-16', surah: 'الناس', accuracy: 75, notes: 'أداء جيد جداً' }];
   }
 };
