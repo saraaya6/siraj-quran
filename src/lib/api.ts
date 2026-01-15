@@ -32,7 +32,7 @@ export const analyzeAudio = async (
     );
 
     const data = response.data;
-    console.log("تم استلام البيانات وتحويلها:", data);
+    console.log("البيانات النهائية من السيرفر:", data);
 
     const mistakes: MistakeResult = {
       missing: [],
@@ -40,39 +40,35 @@ export const analyzeAudio = async (
       replaced: []
     };
 
-    // هذا الجزء هو "المحرك" الجديد الذي يقرأ مصفوفة ayahs التي أظهرها الكونسول
+    // تحويل بيانات الآيات إلى أخطاء واضحة للواجهة
     if (data.ayahs && Array.isArray(data.ayahs)) {
       data.ayahs.forEach((item: any) => {
-        // إذا كان السيرفر يقول أن هناك عدم تطابق في الآية
-        if (item.heard_normalized !== item.reference) {
+        // إذا كان السيرفر أرسل نصاً مسموعاً مختلفاً عن الأصل
+        if (item.heard_normalized && item.heard_normalized !== item.reference) {
           mistakes.replaced.push({
-            expected: item.reference, // النص الصحيح للآية
-            got: item.heard_raw       // ما نطقته سارة
+            expected: item.reference,
+            got: item.heard_raw
           });
+        } 
+        // حالة خاصة: إذا السيرفر أعطى دقة 0 ولم يرسل نصاً (مثل آخر كونسول أرسلتيه)
+        else if (data.overall_accuracy < 50 && item.heard_raw === '') {
+          mistakes.missing.push(`آية رقم ${item.ayah}: لم يتم التعرف على القراءة`);
         }
       });
     }
 
-    // نستخدم الأرقام القادمة من رغد مباشرة (75 أو 100 أو غيره)
+    // هنا تكمن القوة: نأخذ الرقم من السيرفر مباشرة مهما كان
+    const finalAccuracy = typeof data.overall_accuracy === 'number' ? data.overall_accuracy : 0;
+
     return {
       mistakes,
-      accuracy: data.overall_accuracy !== undefined ? data.overall_accuracy : 0,
-      recommendation: data.recommendation || "استمر في المحاولة",
-      totalMistakes: mistakes.replaced.length
+      accuracy: finalAccuracy,
+      recommendation: data.recommendation || "جرب القراءة مرة أخرى بوضوح",
+      totalMistakes: mistakes.replaced.length + mistakes.missing.length
     };
 
   } catch (error) {
-    console.error('Error analyzing audio:', error);
-    throw new Error('فشل الاتصال بسيرفر الذكاء الاصطناعي.');
-  }
-};
-
-export const fetchSessionNotes = async () => {
-  try {
-    const response = await axios.get(`${NOTES_API_URL}/notes`);
-    return response.data;
-  } catch (error) {
-    // في حال عدم توفر الباك إند الخاص بالملاحظات
-    return [{ id: '1', date: '2026-01-16', surah: 'الناس', accuracy: 75, notes: 'أداء جيد جداً' }];
+    console.error('Error:', error);
+    throw new Error('حدث خطأ في الاتصال بالسيرفر');
   }
 };
