@@ -44,7 +44,7 @@ npm run dev
 The application will be available at http://localhost:5173.
 
 🔗 API Integration
-AI Analysis: The frontend communicates with an external AI service at http://41.33.55.164:8001/audio/analyze.
+AI Analysis: The frontend communicates with an external AI service .
 
 Backend Service: Parent reports are fetched from a local backend at http://localhost:5000/notes.
 
