@@ -1,6 +1,7 @@
 import axios from 'axios';
 
-const AI_API_URL = 'http://41.33.55.164:8001';
+// استخدام متغيرات البيئة لإخفاء عنوان IP الحقيقي ومنع كشفه في الكود المصدري
+const AI_API_URL = import.meta.env.VITE_AI_API_URL;
 const NOTES_API_URL = 'http://localhost:5000';
 
 export interface MistakeResult {
@@ -33,6 +34,7 @@ export const analyzeAudio = async (
   formData.append('file', audioBlob, 'recording.wav');
 
   try {
+    // إرسال الطلب إلى السيرفر المشفر في ملف البيئة
     const response = await axios.post(
       `${AI_API_URL}/audio/analyze?surah=${encodeURIComponent(surah)}&language=${encodeURIComponent(language)}`,
       formData,
@@ -45,16 +47,17 @@ export const analyzeAudio = async (
 
     const data = response.data;
     
-    // Calculate accuracy based on AI_LOGIC.md
+    // حساب الدقة بناءً على الأخطاء الواردة من السيرفر
     const mistakes = data.mistakes || { missing: [], extra: [], replaced: [] };
     const totalMistakes = 
       (mistakes.missing?.length || 0) + 
       (mistakes.extra?.length || 0) + 
       (mistakes.replaced?.length || 0);
     
+    // معادلة حساب نسبة الدقة
     const accuracy = Math.max(0, Math.min(100, ((20 - totalMistakes) / 20) * 100));
     
-    // Generate recommendation
+    // تحديد النصيحة التعليمية بناءً على مستوى الأداء
     let recommendation: string;
     if (accuracy >= 90) {
       recommendation = 'ممتاز! كرر مرة واحدة للتعزيز.';
@@ -71,18 +74,9 @@ export const analyzeAudio = async (
       totalMistakes,
     };
   } catch (error) {
+    // في حال فشل الاتصال، يتم تسجيل الخطأ الحقيقي وإبلاغ المستخدم بدلاً من عرض بيانات وهمية
     console.error('Error analyzing audio:', error);
-    // Return mock data for demo purposes
-    return {
-      mistakes: {
-        missing: ['الناس'],
-        extra: [],
-        replaced: [{ expected: 'ملك', got: 'مالك' }],
-      },
-      accuracy: 80,
-      recommendation: 'جيد! كرر مرتين وركز على الأخطاء.',
-      totalMistakes: 2,
-    };
+    throw new Error('فشل الاتصال بسيرفر الذكاء الاصطناعي. تأكد من تشغيل السيرفر وصحة عنوان IP.');
   }
 };
 
@@ -92,7 +86,7 @@ export const fetchSessionNotes = async (): Promise<SessionNote[]> => {
     return response.data;
   } catch (error) {
     console.error('Error fetching session notes:', error);
-    // Return mock data for demo
+    // تم الإبقاء على البيانات التجريبية هنا فقط لعرض واجهة ركن الوالدين حال عدم توفر باك إند محلي
     return [
       {
         id: '1',
@@ -100,21 +94,7 @@ export const fetchSessionNotes = async (): Promise<SessionNote[]> => {
         surah: 'الناس',
         accuracy: 85,
         notes: 'أداء جيد مع بعض الأخطاء في الحركات',
-      },
-      {
-        id: '2',
-        date: '2026-01-09',
-        surah: 'الفلق',
-        accuracy: 92,
-        notes: 'ممتاز! تحسن ملحوظ',
-      },
-      {
-        id: '3',
-        date: '2026-01-08',
-        surah: 'الإخلاص',
-        accuracy: 78,
-        notes: 'يحتاج مراجعة للتجويد',
-      },
+      }
     ];
   }
 };
