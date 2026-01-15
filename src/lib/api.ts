@@ -1,8 +1,7 @@
 import axios from 'axios';
 
-// استخدام متغيرات البيئة لإخفاء عنوان IP الحقيقي ومنع كشفه في الكود المصدري
 const AI_API_URL = import.meta.env.VITE_AI_API_URL;
-const NOTES_API_URL = 'http://localhost:5000';
+const NOTES_API_URL = import.meta.env.NOTES_API_URL ;
 
 export interface MistakeResult {
   missing: string[];
