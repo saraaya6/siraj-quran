@@ -31,7 +31,11 @@ export const analyzeAudio = async (
   language: string = 'ar'
 ): Promise<AnalysisResult> => {
   const formData = new FormData();
+<<<<<<< HEAD
   // إرسال الملف تحت مفتاح 'file' كما يتوقع السيرفر
+=======
+  // إرسال الملف تحت مفتاح 'file' كما يتوقع السيرفر غالباً
+>>>>>>> c7c1e4b7d74fa5f4bfd9ad421d2d739af0be36f4
   formData.append('file', audioBlob, 'recording.wav');
 
   // طباعة الرابط للتأكد من صحة العنوان والمنفذ في المتصفح
@@ -93,6 +97,7 @@ export const fetchSessionNotes = async (): Promise<SessionNote[]> => {
     return response.data;
   } catch (error) {
     console.error('Error fetching session notes:', error);
+    // بيانات تجريبية في حال عدم توفر سيرفر الملاحظات
     return [
       {
         id: '1',
