@@ -1,6 +1,5 @@
 import axios from 'axios';
 
-// قراءة الروابط من متغيرات بيئة Vercel
 const AI_API_URL = import.meta.env.VITE_AI_API_URL;
 const NOTES_API_URL = import.meta.env.VITE_NOTES_API_URL;
 
@@ -31,15 +30,7 @@ export const analyzeAudio = async (
   language: string = 'ar'
 ): Promise<AnalysisResult> => {
   const formData = new FormData();
-<<<<<<< HEAD
-  // إرسال الملف تحت مفتاح 'file' كما يتوقع السيرفر
-=======
-  // إرسال الملف تحت مفتاح 'file' كما يتوقع السيرفر غالباً
->>>>>>> c7c1e4b7d74fa5f4bfd9ad421d2d739af0be36f4
   formData.append('file', audioBlob, 'recording.wav');
-
-  // طباعة الرابط للتأكد من صحة العنوان والمنفذ في المتصفح
-  console.log("Full Request URL:", `${AI_API_URL}/audio/analyze`);
 
   try {
     const response = await axios.post(
@@ -53,31 +44,28 @@ export const analyzeAudio = async (
     );
 
     const data = response.data;
-    
-    // سطر الفحص الأهم: يطبع لك البيانات الخام القادمة من السيرفر في الـ Console
-    console.log("البيانات القادمة من السيرفر:", data);
+    console.log("البيانات المستلمة:", data);
 
-    // التحقق من وجود حقل mistakes أو استخدام مصفوفات فارغة كبديل
-    const mistakes = data.mistakes || { missing: [], extra: [], replaced: [] };
-    
-    // حساب مجموع الأخطاء المكتشفة
+    // 1. استخراج الأخطاء من حقل ayahs إذا وجد، أو نضع مصفوفات فارغة
+    // ملاحظة: السيرفر حالياً لا يرسل تفاصيل الأخطاء بشكل صريح في mistakes
+    const mistakes: MistakeResult = data.mistakes || {
+      missing: [],
+      extra: [],
+      replaced: []
+    };
+
+    // 2. استخدام الدقة المرسلة مباشرة من السيرفر
+    // إذا كانت overall_accuracy موجودة نستخدمها، وإلا نضع 0
+    const accuracy = data.overall_accuracy !== undefined ? data.overall_accuracy : 0;
+
+    // 3. استخدام التوصية المرسلة من السيرفر
+    const recommendation = data.recommendation || "استمر في المحاولة!";
+
+    // 4. حساب عدد الأخطاء (سيكون 0 حالياً لأن السيرفر لا يرسل تفاصيل mistakes)
     const totalMistakes = 
       (mistakes.missing?.length || 0) + 
       (mistakes.extra?.length || 0) + 
       (mistakes.replaced?.length || 0);
-    
-    // معادلة حساب نسبة الدقة بناءً على الأخطاء
-    const accuracy = Math.max(0, Math.min(100, ((20 - totalMistakes) / 20) * 100));
-    
-    // تحديد النصيحة التعليمية بناءً على الأداء
-    let recommendation: string;
-    if (accuracy >= 90) {
-      recommendation = 'ممتاز! كرر مرة واحدة للتعزيز.';
-    } else if (accuracy >= 70) {
-      recommendation = 'جيد! كرر مرتين وركز على الأخطاء.';
-    } else {
-      recommendation = 'تحتاج للتدريب. قسّم السورة وكرر آية بآية.';
-    }
 
     return {
       mistakes,
@@ -87,7 +75,7 @@ export const analyzeAudio = async (
     };
   } catch (error) {
     console.error('Error analyzing audio:', error);
-    throw new Error('فشل الاتصال بسيرفر الذكاء الاصطناعي. تأكد من استجابة السيرفر.');
+    throw new Error('فشل الاتصال بسيرفر الذكاء الاصطناعي.');
   }
 };
 
@@ -96,8 +84,6 @@ export const fetchSessionNotes = async (): Promise<SessionNote[]> => {
     const response = await axios.get(`${NOTES_API_URL}/notes`);
     return response.data;
   } catch (error) {
-    console.error('Error fetching session notes:', error);
-    // بيانات تجريبية في حال عدم توفر سيرفر الملاحظات
     return [
       {
         id: '1',
@@ -108,5 +94,4 @@ export const fetchSessionNotes = async (): Promise<SessionNote[]> => {
       }
     ];
   }
-  
 };
